@@ -57,6 +57,8 @@ event http_entity_data(c: connection, is_orig: bool, length: count, data: string
 	if (/id=[0-9]+/ in data &&
 		/&vs=[0-9\.]+/ in data && 
 		/&os=[0-9]+/ in data &&
+		/&bi=[01]/ in data &&
+		/&ar=[01]/ in data &&
 		/&pc=/ in data &&
 		/&un=/ in data)
 		{
