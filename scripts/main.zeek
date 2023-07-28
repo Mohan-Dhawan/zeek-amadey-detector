@@ -59,16 +59,25 @@ function emit_log(c: connection)
 	delete c$amadey;
 }
 
+# Make regex global so they are only compiled once.
+global id_regex = /id=[0-9]+/;
+global vs_regex = /&vs=[0-9\.]+/;
+global os_regex = /&os=[0-9]+/;
+global bi_regex = /&bi=[01]/;
+global ar_regex = /&ar=[01]/;
+global pc_regex = /&pc=/;
+global un_regex = /&un=/;
+
 event http_entity_data(c: connection, is_orig: bool, length: count,
     data: string)
 {
-	if ( /id=[0-9]+/ in data
-	    && /&vs=[0-9\.]+/ in data
-	    && /&os=[0-9]+/ in data
-	    && /&bi=[01]/ in data
-	    && /&ar=[01]/ in data
-	    && /&pc=/ in data
-	    && /&un=/ in data ) {
+	if ( id_regex in data
+	    && vs_regex in data
+	    && os_regex in data
+	    && bi_regex in data
+	    && ar_regex in data
+	    && pc_regex in data
+	    && un_regex in data ) {
 		# This is probably Amadey!
 		hook set_session(c);
 
