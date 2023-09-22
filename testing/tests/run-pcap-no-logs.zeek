@@ -3,5 +3,6 @@
 # @TEST-EXEC: btest-diff output
 # @TEST-EXEC: test ! -f amadey.log
 # @TEST-EXEC: btest-diff notice.log
+# @TEST-EXEC: btest-diff http.log
 
 redef Amadey::enable_detailed_logs = F;
