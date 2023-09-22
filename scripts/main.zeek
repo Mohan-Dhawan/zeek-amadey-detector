@@ -7,6 +7,9 @@ export {
 	## The notice when Amadey C2 is observed.
 	redef enum Notice::Type += { Amadey, };
 
+	## An option to enable detailed logs
+	option enable_detailed_logs = T;
+
 	## Record type containing the column fields of the Amadey log.
 	type Info: record {
 		## Timestamp for when the activity happened.
@@ -26,30 +29,10 @@ export {
 
 	## A default logging policy hook for the stream.
 	global log_policy: Log::PolicyHook;
+
+	## Indicator of a request related to Amadey
+	redef enum HTTP::Tags += { URI_AMADEYMALWARE, };
 }
-
-redef record connection += {
-	amadey: Info &optional;
-};
-
-# Initialize logging state.
-hook set_session(c: connection)
-	{
-	if ( c?$amadey )
-		return;
-
-	c$amadey = Info($ts=network_time(), $uid=c$uid, $id=c$id, $is_orig=T,
-	    $payload="");
-	}
-
-function emit_log(c: connection)
-	{
-	if ( ! c?$amadey )
-		return;
-
-	Log::write(Amadey::LOG, c$amadey);
-	delete c$amadey;
-	}
 
 # Make regex global so they are only compiled once.
 global id_regex = /^id=[0-9]+/;
@@ -71,17 +54,24 @@ event http_entity_data(c: connection, is_orig: bool, length: count,
 	    && pc_regex in data
 	    && un_regex in data )
 		{
-		# This is probably Amadey!
-		hook set_session(c);
+		add c$http$tags[URI_AMADEYMALWARE];
 
-		c$amadey$payload = data;
-		c$amadey$is_orig = is_orig;
+		local msg = fmt("Potential Amadey C2 between source %s and dest %s (is_orig=%s) with payload in the sub field.",
+		    c$id$orig_h, c$id$resp_h, is_orig);
 
-		emit_log(c);
+		if ( enable_detailed_logs )
+			{
+			local info = Info($ts=network_time(), $uid=c$uid, $id=c$id, $is_orig=is_orig,
+			    $payload=data);
 
-		NOTICE([ $note=Amadey::Amadey, $msg=fmt("Potential Amadey C2 between source %s and dest %s (is_orig=%s) with payload %s",
-		    c$id$orig_h, c$id$resp_h, is_orig, data), $conn=c,
-		    $identifier=cat(c$id$orig_h, c$id$resp_h) ]);
+			Log::write(Amadey::LOG, info);
+
+			NOTICE([ $note=Amadey::Amadey, $msg=msg, $sub=data, $conn=c, $identifier=cat(
+			    c$id$orig_h, c$id$resp_h) ]);
+			}
+		else
+			# Do not suppress notices.
+			NOTICE([ $note=Amadey::Amadey, $msg=msg, $sub=data, $conn=c ]);
 		}
 	}
 
