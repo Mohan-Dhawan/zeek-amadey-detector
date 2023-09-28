@@ -4,3 +4,6 @@
 # @TEST-EXEC: btest-diff amadey.log
 # @TEST-EXEC: btest-diff notice.log
 # @TEST-EXEC: btest-diff http.log
+
+# Turn on logs
+redef Amadey::enable_detailed_logs = T;
