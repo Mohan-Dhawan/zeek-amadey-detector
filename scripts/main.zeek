@@ -82,6 +82,6 @@ event http_entity_data(c: connection, is_orig: bool, length: count,
 
 event zeek_init() &priority=5
 	{
-		if ( enable_detailed_logs )
-			Log::create_stream(Amadey::LOG, [ $columns=Info, $ev=log_amadey, $path="amadey", $policy=Amadey::log_policy ]);
+	if ( enable_detailed_logs )
+		Log::create_stream(Amadey::LOG, [ $columns=Info, $ev=log_amadey, $path="amadey", $policy=Amadey::log_policy ]);
 	}
