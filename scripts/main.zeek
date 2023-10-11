@@ -44,35 +44,34 @@ global pc_regex = /&pc=/;
 global un_regex = /&un=/;
 
 event http_entity_data(c: connection, is_orig: bool, length: count,
-    data: string)
+	data: string)
 	{
-
 	# Bail on anything not a post.
 	if ( ! c?$http || ! c$http?$method || c$http$method != "POST" )
 		return;
-	
+
 	if ( id_regex in data
-	    && vs_regex in data
-	    && os_regex in data
-	    && bi_regex in data
-	    && ar_regex in data
-	    && pc_regex in data
-	    && un_regex in data )
+		&& vs_regex in data
+		&& os_regex in data
+		&& bi_regex in data
+		&& ar_regex in data
+		&& pc_regex in data
+		&& un_regex in data )
 		{
 		add c$http$tags[URI_AMADEYMALWARE];
 
 		local msg = fmt("Potential Amadey C2 between source %s and dest %s (is_orig=%s) with payload in the sub field.",
-		    c$id$orig_h, c$id$resp_h, is_orig);
+			c$id$orig_h, c$id$resp_h, is_orig);
 
 		if ( enable_detailed_logs )
 			{
 			local info = Info($ts=network_time(), $uid=c$uid, $id=c$id, $is_orig=is_orig,
-			    $payload=data);
+				$payload=data);
 
 			Log::write(Amadey::LOG, info);
 
 			NOTICE([ $note=Amadey::Amadey, $msg=msg, $sub=data, $conn=c, $identifier=cat(
-			    c$id$orig_h, c$id$resp_h) ]);
+				c$id$orig_h, c$id$resp_h) ]);
 			}
 		else
 			# Do not suppress notices.
@@ -83,5 +82,6 @@ event http_entity_data(c: connection, is_orig: bool, length: count,
 event zeek_init() &priority=5
 	{
 	if ( enable_detailed_logs )
-		Log::create_stream(Amadey::LOG, [ $columns=Info, $ev=log_amadey, $path="amadey", $policy=Amadey::log_policy ]);
+		Log::create_stream(Amadey::LOG, [ $columns=Info, $ev=log_amadey,
+			$path="amadey", $policy=Amadey::log_policy ]);
 	}
