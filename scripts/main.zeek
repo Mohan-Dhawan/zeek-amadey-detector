@@ -46,6 +46,11 @@ global un_regex = /&un=/;
 event http_entity_data(c: connection, is_orig: bool, length: count,
     data: string)
 	{
+
+	# Bail on anything not a post.
+	if ( ! c?$http || ! c$http?$method || c$http$method != "POST" )
+		return;
+	
 	if ( id_regex in data
 	    && vs_regex in data
 	    && os_regex in data
