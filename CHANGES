@@ -1,3 +1,4 @@
+v0.1.8:     Changed notice namespace.
 v0.1.7:     Switch variable to const redef.
 v0.1.6:     Added some optimizations in the http event.
 v0.1.5:     Improved tests.
