@@ -5,7 +5,7 @@ export {
 	redef enum Log::ID += { LOG };
 
 	## The notice when Amadey C2 is observed.
-	redef enum Notice::Type += { Amadey, };
+	redef enum Notice::Type += { C2_Traffic_Observed, };
 
 	## An option to enable detailed logs
 	const enable_detailed_logs = T &redef;
@@ -31,7 +31,7 @@ export {
 	global log_policy: Log::PolicyHook;
 
 	## Indicator of a request related to Amadey
-	redef enum HTTP::Tags += { URI_AMADEYMALWARE, };
+	redef enum HTTP::Tags += { URI_AMADEY_C2, };
 }
 
 # Make regex global so they are only compiled once.
@@ -58,7 +58,7 @@ event http_entity_data(c: connection, is_orig: bool, length: count,
 		&& pc_regex in data
 		&& un_regex in data )
 		{
-		add c$http$tags[URI_AMADEYMALWARE];
+		add c$http$tags[URI_AMADEY_C2];
 
 		local msg = fmt("Potential Amadey C2 between source %s and dest %s (is_orig=%s) with payload in the sub field.",
 			c$id$orig_h, c$id$resp_h, is_orig);
@@ -70,12 +70,12 @@ event http_entity_data(c: connection, is_orig: bool, length: count,
 
 			Log::write(Amadey::LOG, info);
 
-			NOTICE([ $note=Amadey::Amadey, $msg=msg, $sub=data, $conn=c, $identifier=cat(
+			NOTICE([ $note=Amadey::C2_Traffic_Observed, $msg=msg, $sub=data, $conn=c, $identifier=cat(
 				c$id$orig_h, c$id$resp_h) ]);
 			}
 		else
 			# Do not suppress notices.
-			NOTICE([ $note=Amadey::Amadey, $msg=msg, $sub=data, $conn=c ]);
+			NOTICE([ $note=Amadey::C2_Traffic_Observed, $msg=msg, $sub=data, $conn=c ]);
 		}
 	}
 
