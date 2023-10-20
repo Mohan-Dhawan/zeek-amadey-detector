@@ -30,10 +30,18 @@ export {
 	## A default logging policy hook for the stream.
 	global log_policy: Log::PolicyHook;
 
+	## Indicator of SolarMarker C2.
+	redef enum HTTP::Tags += { URI_Amadey_C2, };
+
+	# Signature match function.
 	function amadey_match(state: signature_state, data: string): bool
 		{
 		local msg = fmt("Potential Amadey C2 between source %s and dest %s (is_orig=%s) with payload in the sub field.",
 		    state$conn$id$orig_h, state$conn$id$resp_h, state$is_orig);
+
+		if ( state$conn?$http )
+			# Add a tag to the http.log.
+			add state$conn$http$tags[URI_Amadey_C2];
 
 		if ( enable_detailed_logs )
 			{
