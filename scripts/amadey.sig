@@ -10,3 +10,10 @@ signature amadey_sig {
     http-request-body /.*&un=/
     eval Amadey::amadey_match
 }
+
+signature amadey_sig_20231102_1 {
+    ip-proto == tcp
+    payload /^POST/
+    http-request-body /^st=s/
+    eval Amadey::amadey_match
+}
