@@ -6,7 +6,7 @@ Blog: https://drkeithjones.com/index.php/2023/06/15/detecting-amadey-malware-wit
 
 Video: https://youtube.com/live/AArPGeYdoNU?feature=share
 
-### Update Nov, 2, 2023
+### Update Nov 2, 2023
 
 Added the new C2 in this sample:
 
