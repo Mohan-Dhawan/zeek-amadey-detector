@@ -32,7 +32,7 @@ export {
 	## A default logging policy hook for the stream.
 	global log_policy: Log::PolicyHook;
 
-	## Indicator of SolarMarker C2.
+	## Indicator of Amadey C2.
 	redef enum HTTP::Tags += { URI_Amadey_C2, };
 }
 
