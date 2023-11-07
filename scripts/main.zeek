@@ -73,7 +73,7 @@ function amadey_detected(c: connection, is_orig: bool, data: string,
 	}
 
 # Signature match function.
-function amadey_match(state: signature_state, data: string): bool
+function amadey_match(state: signature_state, data: string): bool &is_used
 	{
 	amadey_detected(state$conn, state$is_orig, data, T);
 	return T;
